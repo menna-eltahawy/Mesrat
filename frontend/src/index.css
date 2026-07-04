@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+.pulse-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pulse-icon-inner {
+  width: 12px;
+  height: 12px;
+  background-color: #C9A96E;
+  border-radius: 50%;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(201, 169, 110, 0.8);
+}
+
+.pulse-icon-ring {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  background-color: transparent;
+  border: 2px solid #C9A96E;
+  border-radius: 50%;
+  animation: pulse-animation 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
