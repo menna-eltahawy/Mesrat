@@ -1,6 +1,27 @@
 import  { useState, useRef, useEffect } from 'react';
 import './Chatbot.css';
 
+// سياق المعرض المخصص (RAG) لضمان دقة الإجابات باللغة العربية
+const masaratContext = `
+أنت مرشد ذكي لمعرض "مسارات - رحلة عبر هوية مصر".
+معلومات عن المعرض والموقع الإلكتروني:
+- المعرض يستعرض ثقافات، تراث، وهوية المحافظات المصرية.
+موقع المعرض وطرق الوصول:
+- يقع المعرض في "العاصمة الإدارية الجديدة".
+- من "القليوبية": الطريق الدائري الإقليمي، أو مواصلات لرمسيس ثم القطار الكهربائي الخفيف (LRT).
+- من "رمسيس": مترو الخط الثالث لمحطة "عدلي منصور"، ثم الـ LRT.
+الأجنحة والأقسام:
+- الاستقبال (Reception): نقطة البداية.
+- المسرح (Theater): عروض التنورة والتحطيب.
+- جناح القاهرة (Cairo): التراث الإسلامي والقبطي.
+- جناح الإسكندرية (Alexandria): التراث اليوناني الروماني.
+- جناح أسوان (Aswan): سحر النوبة والعمارة النوبية.
+- جناح الأقصر (Luxor): الحضارة الفرعونية القديمة.
+- جناح سيوة (Siwa): التراث الأمازيغي والتمور وبحيرات الملح.
+قواعد الاستجابة:
+- إجاباتك ودودة، احترافية، وموجزة. لا تخترع معلومات من خارج هذا السياق.
+`;
+
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -32,33 +53,42 @@ const Chatbot = () => {
       const historyToSend = messages
         .filter((msg, index) => index !== 0) 
         .map(msg => ({ 
-            role: msg.role === 'model' ? 'model' : 'user', 
-            parts: [{ text: msg.text }] 
+            role: msg.role === 'model' ? 'assistant' : 'user', 
+            content: msg.text 
         }));
 
-      // استخدام متغيرات البيئة الخاصة بـ Vite
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const isFirstMessage = historyToSend.length === 0;
+      let finalMessage = textToSend;
+      
+      if (isFirstMessage) {
+          finalMessage = `تعليمات صارمة للإجابة:\n${masaratContext}\n\nسؤال المستخدم:\n${textToSend}`;
+      }
 
-      const response = await fetch(`${apiUrl}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            message: textToSend,
-            history: historyToSend
-        }),
+      historyToSend.push({ role: 'user', content: finalMessage });
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "openrouter/free", 
+            messages: historyToSend,
+        })
       });
       
       const data = await response.json();
 
-      if (response.ok && data.text) {
-        setMessages([...newMessages, { role: 'model', text: data.text }]);
+      if (response.ok && data.choices && data.choices[0]) {
+        setMessages([...newMessages, { role: 'model', text: data.choices[0].message.content }]);
       } else {
-        console.error("Backend Error:", data.error || "Unknown error");
-        setMessages([...newMessages, { role: 'model', text: "عذراً، حدث خطأ في الخادم." }]);
+        console.error("API Error:", data.error?.message || "Unknown error");
+        setMessages([...newMessages, { role: 'model', text: "عذراً، حدث خطأ في الاتصال بالذكاء الاصطناعي." }]);
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      setMessages([...newMessages, { role: 'model', text: "عذراً، لا يمكن الاتصال بالخادم." }]);
+      setMessages([...newMessages, { role: 'model', text: "عذراً، تأكد من اتصالك بالإنترنت." }]);
     } finally {
       setIsLoading(false); 
     }
