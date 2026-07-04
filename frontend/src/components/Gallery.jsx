@@ -4,7 +4,7 @@ export default function Gallery() {
   const governorates = [
     { id: 1, name: 'Reception', images: ['/res (1).png', '/res (2).png', '/res (3).png', '/res (4).png', '/res (5).png'] }, 
     { id: 2, name: 'Theater', images: ['/the (1).jpeg', '/the (2).jpeg', '/the (3).jpeg', '/the (4).jpeg'] },
-    { id: 3, name: 'Cairo', images: ['/caior (1).jpeg', '/caior (2).jpeg', '/caior (3).jpeg', '/caior (4).jpeg', '/caior (5).jpeg', '/caior (6).jpeg'] },
+    { id: 3, name: 'Cairo', images: ['/Cairoo.jpg', '/caior (2).jpeg', '/caior (3).jpeg', '/caior (4).jpeg', '/caior (5).jpeg', '/Cairo.jpg'] },
     { id: 4, name: 'Alexandria', images: ['/Alex.jpeg', '/Alex (1).jpeg', '/Alex (2).jpeg', '/Alex (3).jpeg', '/Alex (4).jpeg', '/Alex (5).jpeg', '/Alex (6).jpeg'] },
     { id: 5, name: 'Aswan', images: ['/Aswan (1).png', '/Aswan (2).png', '/Aswan (3).png', '/Aswan (4).png', '/Aswan (5).png', '/Aswan (6).png', '/Aswan (7).png', '/Aswan (8).png', '/Aswan (9).png'] },
     { id: 6, name: 'Luxor', images: ['/Luxor (1).png', '/Luxor (2).png', '/Luxor (3).png', '/Luxor (4).png', '/Luxor (5).png', '/Luxor (6).png'] },
