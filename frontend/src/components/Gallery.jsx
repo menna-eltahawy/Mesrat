@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Gallery() {
   const governorates = [
@@ -29,8 +29,38 @@ export default function Gallery() {
     }
   };
 
+  const prevImage = () => {
+    if (activeGov.images.length > 0) {
+      setCurrentIdx((prev) => (prev === 0 ? activeGov.images.length - 1 : prev - 1));
+    }
+  };
+
+  
+  useEffect(() => {
+    
+    if (activeGov.images.length <= 1) return;
+
+    const timer = setInterval(() => {
+      nextImage();
+    }, 7000);
+
+    return () => clearInterval(timer);
+  }, [currentIdx, activeGov.id]); 
+
   return (
     <section id="gallery" className="py-24 bg-[#050508]">
+      <style>
+        {`
+          @keyframes fadeZoom {
+            from { opacity: 0.4; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+          }
+          .animate-fade-zoom {
+            animation: fadeZoom 0.6s ease-out forwards;
+          }
+        `}
+      </style>
+
       <div className="container mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-serif text-white mb-12 md:mb-16 text-center">Exhibition Spaces</h2>
         
@@ -57,17 +87,114 @@ export default function Gallery() {
             
             {activeGov.images.length > 0 ? (
               <div className="w-full flex flex-col items-center">
+                
                 <img 
+                  key={currentIdx}
                   src={activeGov.images[currentIdx]} 
                   alt={`${activeGov.name} ${currentIdx + 1}`}
-                  className="w-full max-h-[300px] md:max-h-[400px] object-cover rounded-lg shadow-2xl mb-6 transition-opacity duration-500"
+                  className="w-full max-h-[300px] md:max-h-[400px] object-cover rounded-lg shadow-2xl mb-6 animate-fade-zoom"
                 />
-                <button 
-                  onClick={nextImage}
-                  className="w-full md:w-auto px-8 py-3 bg-primary text-black font-bold hover:bg-white transition-colors"
-                >
-                  Next Image ({currentIdx + 1} / {activeGov.images.length})
-                </button>
+                
+                
+                <div className="flex gap-4 items-center justify-center w-full mt-2">
+                  <button 
+                    onClick={prevImage}
+                    className="px-6 py-2 bg-white/10 text-white font-bold hover:bg-white/20 rounded transition-colors"
+                  >
+                    Previous
+                  </button>
+                  
+                  <span className="text-white/60 font-mono text-sm px-4">
+                    {currentIdx + 1} / {activeGov.images.length}
+                  </span>
+
+                  <button 
+                    onClick={nextImage}
+                    className="px-6 py-2 bg-primary text-black font-bold hover:bg-white rounded transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-64 md:h-80 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/20">
+                <span className="text-white/30 italic text-center px-4">Images coming soon for {activeGov.name}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+                    onClick={nextImage}
+                    className="px-6 py-2 bg-primary text-black font-bold hover:bg-white rounded transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-64 md:h-80 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/20">
+                <span className="text-white/30 italic text-center px-4">Images coming soon for {activeGov.name}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+        
+        <div className="grid md:grid-cols-12 gap-8 md:gap-12">
+          
+          <div className="md:col-span-3 flex overflow-x-auto md:flex-col space-x-2 md:space-x-0 md:space-y-2 pb-4 md:pb-0 scrollbar-hide">
+            {governorates.map((gov) => (
+              <button
+                key={gov.id}
+                onClick={() => handleGovChange(gov)}
+                className={`whitespace-nowrap text-left px-6 py-4 transition-all duration-300 md:border-l-2 border-b-2 md:border-b-0 ${
+                  activeGov.id === gov.id 
+                    ? 'bg-white/5 border-primary text-white' 
+                    : 'border-transparent text-white/40 hover:text-white hover:border-white/20'
+                }`}
+              >
+                {gov.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="md:col-span-9 bg-black/30 border border-white/10 rounded-2xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
+            <h3 className="text-2xl md:text-3xl text-white font-serif mb-6">{activeGov.name} Wing</h3>
+            
+            {activeGov.images.length > 0 ? (
+              <div className="w-full flex flex-col items-center">
+                <img 
+                  key={currentIdx}
+                  src={activeGov.images[currentIdx]} 
+                  alt={`${activeGov.name} ${currentIdx + 1}`}
+                  className="w-full max-h-[300px] md:max-h-[400px] object-cover rounded-lg shadow-2xl mb-6 animate-fade-zoom"
+                />
+                
+                <div className="flex gap-4 items-center justify-center w-full mt-2">
+                  <button 
+                    onClick={prevImage}
+                    className="px-6 py-2 bg-white/10 text-white font-bold hover:bg-white/20 rounded transition-colors"
+                  >
+                    Previous
+                  </button>
+                  
+                  <span className="text-white/60 font-mono text-sm px-4">
+                    {currentIdx + 1} / {activeGov.images.length}
+                  </span>
+
+                  <button 
+                    onClick={nextImage}
+                    className="px-6 py-2 bg-primary text-black font-bold hover:bg-white rounded transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="w-full h-64 md:h-80 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/20">
