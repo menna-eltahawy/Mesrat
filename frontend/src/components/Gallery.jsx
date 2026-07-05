@@ -32,7 +32,7 @@ export default function Gallery() {
   };
 
   useEffect(() => {
-    const timer = setInterval(nextImage, 3000);
+    const timer = setInterval(nextImage, 1000);
     return () => clearInterval(timer);
   }, [currentIdx, activeGov.id]);
 
