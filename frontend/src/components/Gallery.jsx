@@ -24,15 +24,29 @@ export default function Gallery() {
   };
 
   const nextImage = () => {
-    setCurrentIdx((prev) => (prev + 1) % activeGov.images.length);
+    if (currentIdx === activeGov.images.length - 1) {
+      const currentGovIndex = governorates.findIndex(g => g.id === activeGov.id);
+      const nextGovIndex = (currentGovIndex + 1) % governorates.length;
+      setActiveGov(governorates[nextGovIndex]);
+      setCurrentIdx(0);
+    } else {
+      setCurrentIdx((prev) => prev + 1);
+    }
   };
 
   const prevImage = () => {
-    setCurrentIdx((prev) => (prev === 0 ? activeGov.images.length - 1 : prev - 1));
+    if (currentIdx === 0) {
+      const currentGovIndex = governorates.findIndex(g => g.id === activeGov.id);
+      const prevGovIndex = currentGovIndex === 0 ? governorates.length - 1 : currentGovIndex - 1;
+      setActiveGov(governorates[prevGovIndex]);
+      setCurrentIdx(governorates[prevGovIndex].images.length - 1);
+    } else {
+      setCurrentIdx((prev) => prev - 1);
+    }
   };
 
   useEffect(() => {
-    const timer = setInterval(nextImage, 1000);
+    const timer = setInterval(nextImage, 5000);
     return () => clearInterval(timer);
   }, [currentIdx, activeGov.id]);
 
@@ -83,7 +97,7 @@ export default function Gallery() {
             
             <div className="w-full flex flex-col items-center">
               <img 
-                key={currentIdx}
+                key={`${activeGov.id}-${currentIdx}`}
                 src={activeGov.images[currentIdx]} 
                 alt={activeGov.name}
                 className="w-full h-[250px] md:h-[450px] object-cover rounded-lg shadow-2xl mb-6 animate-fade"
