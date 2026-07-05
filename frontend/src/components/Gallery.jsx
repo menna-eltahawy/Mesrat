@@ -24,57 +24,53 @@ export default function Gallery() {
   };
 
   const nextImage = () => {
-    if (activeGov.images.length > 0) {
-      setCurrentIdx((prev) => (prev + 1) % activeGov.images.length);
-    }
+    setCurrentIdx((prev) => (prev + 1) % activeGov.images.length);
   };
 
   const prevImage = () => {
-    if (activeGov.images.length > 0) {
-      setCurrentIdx((prev) => (prev === 0 ? activeGov.images.length - 1 : prev - 1));
-    }
+    setCurrentIdx((prev) => (prev === 0 ? activeGov.images.length - 1 : prev - 1));
   };
 
-  
   useEffect(() => {
-    
-    if (activeGov.images.length <= 1) return;
-
-    const timer = setInterval(() => {
-      nextImage();
-    }, 7000);
-
+    const timer = setInterval(nextImage, 7000);
     return () => clearInterval(timer);
-  }, [currentIdx, activeGov.id]); 
+  }, [currentIdx, activeGov.id]);
 
   return (
-    <section id="gallery" className="py-24 bg-[#050508]">
+    <section id="gallery" className="py-12 md:py-24 bg-[#050508]">
       <style>
         {`
-          @keyframes fadeZoom {
-            from { opacity: 0.4; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+          @keyframes fade {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
           }
-          .animate-fade-zoom {
-            animation: fadeZoom 0.6s ease-out forwards;
+          .animate-fade {
+            animation: fade 0.6s ease-in-out;
+          }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
           }
         `}
       </style>
 
-      <div className="container mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-serif text-white mb-12 md:mb-16 text-center">Exhibition Spaces</h2>
+      <div className="container mx-auto px-4 md:px-6">
+        <h2 className="text-2xl md:text-4xl font-serif text-white mb-8 md:mb-16 text-center">Exhibition Spaces</h2>
         
-        <div className="grid md:grid-cols-12 gap-8 md:gap-12">
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-12">
           
-          <div className="md:col-span-3 flex overflow-x-auto md:flex-col space-x-2 md:space-x-0 md:space-y-2 pb-4 md:pb-0 scrollbar-hide">
+          <div className="md:col-span-3 flex overflow-x-auto md:flex-col gap-3 pb-2 md:pb-0 scrollbar-hide snap-x">
             {governorates.map((gov) => (
               <button
                 key={gov.id}
                 onClick={() => handleGovChange(gov)}
-                className={`whitespace-nowrap text-left px-6 py-4 transition-all duration-300 md:border-l-2 border-b-2 md:border-b-0 ${
+                className={`snap-start shrink-0 text-left px-5 py-3 md:px-6 md:py-4 transition-all duration-300 rounded-lg md:rounded-none md:border-l-2 md:border-b-0 ${
                   activeGov.id === gov.id 
-                    ? 'bg-white/5 border-primary text-white' 
-                    : 'border-transparent text-white/40 hover:text-white hover:border-white/20'
+                    ? 'bg-primary/20 md:bg-white/5 border-primary text-white font-bold' 
+                    : 'border-transparent bg-white/5 md:bg-transparent text-white/50 hover:text-white'
                 }`}
               >
                 {gov.name}
@@ -83,124 +79,36 @@ export default function Gallery() {
           </div>
 
           <div className="md:col-span-9 bg-black/30 border border-white/10 rounded-2xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
-            <h3 className="text-2xl md:text-3xl text-white font-serif mb-6">{activeGov.name} Wing</h3>
+            <h3 className="text-xl md:text-3xl text-white font-serif mb-4 md:mb-6">{activeGov.name} Wing</h3>
             
-            {activeGov.images.length > 0 ? (
-              <div className="w-full flex flex-col items-center">
+            <div className="w-full flex flex-col items-center">
+              <img 
+                key={currentIdx}
+                src={activeGov.images[currentIdx]} 
+                alt={activeGov.name}
+                className="w-full h-[250px] md:h-[450px] object-cover rounded-lg shadow-2xl mb-6 animate-fade"
+              />
+              
+              <div className="flex gap-3 md:gap-4 items-center justify-between w-full md:w-auto md:justify-center">
+                <button 
+                  onClick={prevImage}
+                  className="px-5 py-2 md:px-6 md:py-2 bg-white/10 text-white text-sm md:text-base hover:bg-white/20 transition-all rounded"
+                >
+                  Prev
+                </button>
                 
-                <img 
-                  key={currentIdx}
-                  src={activeGov.images[currentIdx]} 
-                  alt={`${activeGov.name} ${currentIdx + 1}`}
-                  className="w-full max-h-[300px] md:max-h-[400px] object-cover rounded-lg shadow-2xl mb-6 animate-fade-zoom"
-                />
+                <span className="text-white/50 text-xs md:text-sm font-mono mx-2">
+                  {currentIdx + 1} / {activeGov.images.length}
+                </span>
                 
-                
-                <div className="flex gap-4 items-center justify-center w-full mt-2">
-                  <button 
-                    onClick={prevImage}
-                    className="px-6 py-2 bg-white/10 text-white font-bold hover:bg-white/20 rounded transition-colors"
-                  >
-                    Previous
-                  </button>
-                  
-                  <span className="text-white/60 font-mono text-sm px-4">
-                    {currentIdx + 1} / {activeGov.images.length}
-                  </span>
-
-                  <button 
-                    onClick={nextImage}
-                    className="px-6 py-2 bg-primary text-black font-bold hover:bg-white rounded transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
+                <button 
+                  onClick={nextImage}
+                  className="px-5 py-2 md:px-6 md:py-2 bg-primary text-black font-bold text-sm md:text-base hover:bg-white transition-all rounded"
+                >
+                  Next
+                </button>
               </div>
-            ) : (
-              <div className="w-full h-64 md:h-80 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/20">
-                <span className="text-white/30 italic text-center px-4">Images coming soon for {activeGov.name}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-                    onClick={nextImage}
-                    className="px-6 py-2 bg-primary text-black font-bold hover:bg-white rounded transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-64 md:h-80 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/20">
-                <span className="text-white/30 italic text-center px-4">Images coming soon for {activeGov.name}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-        
-        <div className="grid md:grid-cols-12 gap-8 md:gap-12">
-          
-          <div className="md:col-span-3 flex overflow-x-auto md:flex-col space-x-2 md:space-x-0 md:space-y-2 pb-4 md:pb-0 scrollbar-hide">
-            {governorates.map((gov) => (
-              <button
-                key={gov.id}
-                onClick={() => handleGovChange(gov)}
-                className={`whitespace-nowrap text-left px-6 py-4 transition-all duration-300 md:border-l-2 border-b-2 md:border-b-0 ${
-                  activeGov.id === gov.id 
-                    ? 'bg-white/5 border-primary text-white' 
-                    : 'border-transparent text-white/40 hover:text-white hover:border-white/20'
-                }`}
-              >
-                {gov.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="md:col-span-9 bg-black/30 border border-white/10 rounded-2xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
-            <h3 className="text-2xl md:text-3xl text-white font-serif mb-6">{activeGov.name} Wing</h3>
-            
-            {activeGov.images.length > 0 ? (
-              <div className="w-full flex flex-col items-center">
-                <img 
-                  key={currentIdx}
-                  src={activeGov.images[currentIdx]} 
-                  alt={`${activeGov.name} ${currentIdx + 1}`}
-                  className="w-full max-h-[300px] md:max-h-[400px] object-cover rounded-lg shadow-2xl mb-6 animate-fade-zoom"
-                />
-                
-                <div className="flex gap-4 items-center justify-center w-full mt-2">
-                  <button 
-                    onClick={prevImage}
-                    className="px-6 py-2 bg-white/10 text-white font-bold hover:bg-white/20 rounded transition-colors"
-                  >
-                    Previous
-                  </button>
-                  
-                  <span className="text-white/60 font-mono text-sm px-4">
-                    {currentIdx + 1} / {activeGov.images.length}
-                  </span>
-
-                  <button 
-                    onClick={nextImage}
-                    className="px-6 py-2 bg-primary text-black font-bold hover:bg-white rounded transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-64 md:h-80 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/20">
-                <span className="text-white/30 italic text-center px-4">Images coming soon for {activeGov.name}</span>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
