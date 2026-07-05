@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Gallery() {
   const governorates = [
@@ -17,6 +17,8 @@ export default function Gallery() {
 
   const [activeGov, setActiveGov] = useState(governorates[0]);
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   const handleGovChange = (gov) => {
     setActiveGov(gov);
@@ -46,12 +48,33 @@ export default function Gallery() {
   };
 
   useEffect(() => {
-    const timer = setInterval(nextImage, 5000);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.3 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    
+    const timer = setInterval(nextImage, 3000);
     return () => clearInterval(timer);
-  }, [currentIdx, activeGov.id]);
+  }, [currentIdx, activeGov.id, isVisible]);
 
   return (
-    <section id="gallery" className="py-12 md:py-24 bg-[#050508]">
+    <section id="gallery" ref={sectionRef} className="py-12 md:py-24 bg-[#050508]">
       <style>
         {`
           @keyframes fade {
